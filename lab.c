@@ -147,6 +147,80 @@ void filtrarTarefasPorPrioridade(struct Task tasks[], int numTasks) {
     }
 }
 
+void filtrarTarefasPorEstado(struct Task tasks[], int numTasks) {
+    if (numTasks == 0) {
+        printf("Não há tarefas cadastradas.\n");
+        return;
+    }
+
+    char estadoFiltro[20];
+    printf("Digite o estado desejado (completo/em andamento/não iniciado): ");
+    getchar();
+    fgets(estadoFiltro, sizeof(estadoFiltro), stdin);
+
+    int encontrouTarefa = 0;
+
+    printf("Tarefas com estado %s:\n", estadoFiltro);
+    for (int i = 0; i < numTasks; i++) {
+        if (strcmp(tasks[i].state, estadoFiltro) == 0) {
+            printf("Tarefa %d:\n", i + 1);
+            printf("Prioridade: %d\n", tasks[i].priority);
+            printf("Descrição: %s", tasks[i].description);
+            printf("Categoria: %s", tasks[i].category);
+            printf("Estado: %s", tasks[i].state);
+            printf("--------------------\n");
+            encontrouTarefa = 1;
+        }
+    }
+
+    if (!encontrouTarefa) {
+        printf("Nenhuma tarefa encontrada com estado %s.\n", estadoFiltro);
+    }
+}
+
+void filtrarTarefasPorCategoria(struct Task tasks[], int numTasks) {
+    if (numTasks == 0) {
+        printf("Não há tarefas cadastradas.\n");
+        return;
+    }
+
+    char categoriaFiltro[100];
+    printf("Digite a categoria desejada: ");
+    getchar();
+    fgets(categoriaFiltro, sizeof(categoriaFiltro), stdin);
+
+    // Ordenar as tarefas por prioridade da maior para a menor
+    for (int i = 0; i < numTasks - 1; i++) {
+        for (int j = 0; j < numTasks - i - 1; j++) {
+            if (tasks[j].priority < tasks[j + 1].priority) {
+                // Troca as tarefas de lugar se a prioridade for menor
+                struct Task temp = tasks[j];
+                tasks[j] = tasks[j + 1];
+                tasks[j + 1] = temp;
+            }
+        }
+    }
+
+    int encontrouTarefa = 0;
+
+    printf("Tarefas na categoria %s (ordenadas por prioridade da maior para a menor):\n", categoriaFiltro);
+    for (int i = 0; i < numTasks; i++) {
+        if (strcmp(tasks[i].category, categoriaFiltro) == 0) {
+            printf("Tarefa %d:\n", i + 1);
+            printf("Prioridade: %d\n", tasks[i].priority);
+            printf("Descrição: %s", tasks[i].description);
+            printf("Categoria: %s", tasks[i].category);
+            printf("Estado: %s", tasks[i].state);
+            printf("--------------------\n");
+            encontrouTarefa = 1;
+        }
+    }
+
+    if (!encontrouTarefa) {
+        printf("Nenhuma tarefa encontrada na categoria %s.\n", categoriaFiltro);
+    }
+}
+
 int main() {
     int opcao;
     do {
@@ -155,6 +229,9 @@ int main() {
         printf("2. Listar Tarefas\n");
         printf("3. Deletar Tarefa :(\n");
         printf("4. Alterar Tarefa\n");
+        printf("5. Filtrar Tarefas por Prioridade\n");
+        printf("6. Filtrar Tarefas por Estado\n");
+        printf("7. Filtrar Tarefas por Categoria\n");
         printf("0. Sair ;(\n");
         printf("Escolha uma opção: ");
         
@@ -176,6 +253,15 @@ int main() {
             }
             case 4:
                 alterarTarefa(tasks, numTasks);
+                break;
+            case 5:
+                filtrarTarefasPorPrioridade(tasks, numTasks);
+                break;
+            case 6:
+                filtrarTarefasPorEstado(tasks, numTasks);
+                break;
+            case 7:
+                filtrarTarefasPorCategoria(tasks, numTasks);
                 break;
             case 0:
                 printf("Encerrando o programa.\n");
