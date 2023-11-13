@@ -221,6 +221,94 @@ void filtrarTarefasPorCategoria(struct Task tasks[], int numTasks) {
     }
 }
 
+void filtrarTarefasPorPrioridadeECategoria(struct Task tasks[], int numTasks) {
+    if (numTasks == 0) {
+        printf("Não há tarefas cadastradas.\n");
+        return;
+    }
+
+    char categoriaFiltro[100];
+    printf("Digite a categoria desejada: ");
+    getchar();
+    fgets(categoriaFiltro, sizeof(categoriaFiltro), stdin);
+
+    int prioridadeFiltro;
+    printf("Digite a prioridade desejada: ");
+    scanf("%d", &prioridadeFiltro);
+
+    // Ordenar as tarefas por prioridade da maior para a menor
+    for (int i = 0; i < numTasks - 1; i++) {
+        for (int j = 0; j < numTasks - i - 1; j++) {
+            if (tasks[j].priority < tasks[j + 1].priority) {
+                // Troca as tarefas de lugar se a prioridade for menor
+                struct Task temp = tasks[j];
+                tasks[j] = tasks[j + 1];
+                tasks[j + 1] = temp;
+            }
+        }
+    }
+
+    int encontrouTarefa = 0;
+
+    printf("Tarefas na categoria %s e prioridade %d (ordenadas por prioridade da maior para a menor):\n", categoriaFiltro, prioridadeFiltro);
+    for (int i = 0; i < numTasks; i++) {
+        if (strcmp(tasks[i].category, categoriaFiltro) == 0 && tasks[i].priority == prioridadeFiltro) {
+            printf("Tarefa %d:\n", i + 1);
+            printf("Prioridade: %d\n", tasks[i].priority);
+            printf("Descrição: %s", tasks[i].description);
+            printf("Categoria: %s", tasks[i].category);
+            printf("Estado: %s", tasks[i].state);
+            printf("--------------------\n");
+            encontrouTarefa = 1;
+        }
+    }
+
+    if (!encontrouTarefa) {
+        printf("Nenhuma tarefa encontrada na categoria %s e prioridade %d.\n", categoriaFiltro, prioridadeFiltro);
+    }
+}
+
+void exportarTarefasPorPrioridade(struct Task tasks[], int numTasks) {
+    if (numTasks == 0) {
+        printf("Não há tarefas cadastradas.\n");
+        return;
+    }
+
+    int prioridadeFiltro;
+    printf("Digite a prioridade desejada para exportar: ");
+    scanf("%d", &prioridadeFiltro);
+
+    char nomeArquivo[50];
+    printf("Digite o nome do arquivo para exportar: ");
+    getchar();
+    fgets(nomeArquivo, sizeof(nomeArquivo), stdin);
+
+    nomeArquivo[strcspn(nomeArquivo, "\n")] = 0;
+
+    FILE *arquivo = fopen(nomeArquivo, "w");
+    if (arquivo == NULL) {
+        printf("Erro ao criar o arquivo.\n");
+        return;
+    }
+
+    int encontrouTarefa = 0;
+
+    for (int i = 0; i < numTasks; i++) {
+        if (tasks[i].priority == prioridadeFiltro) {
+            fprintf(arquivo, "%d, %s, %s, %s\n", tasks[i].priority, tasks[i].category, tasks[i].state, tasks[i].description);
+            encontrouTarefa = 1;
+        }
+    }
+
+    fclose(arquivo);
+
+    if (encontrouTarefa) {
+        printf("Tarefas com prioridade %d exportadas para o arquivo %s com sucesso!\n", prioridadeFiltro, nomeArquivo);
+    } else {
+        printf("Nenhuma tarefa encontrada com prioridade %d para exportar.\n", prioridadeFiltro);
+    }
+}
+
 int main() {
     int opcao;
     do {
@@ -232,6 +320,8 @@ int main() {
         printf("5. Filtrar Tarefas por Prioridade\n");
         printf("6. Filtrar Tarefas por Estado\n");
         printf("7. Filtrar Tarefas por Categoria\n");
+        printf("8. Filtrar Tarefas por Prioridade e Categoria\n");
+        printf("9. Exportar Tarefas por Prioridade\n");
         printf("0. Sair ;(\n");
         printf("Escolha uma opção: ");
         
@@ -262,6 +352,12 @@ int main() {
                 break;
             case 7:
                 filtrarTarefasPorCategoria(tasks, numTasks);
+                break;
+            case 8:
+                filtrarTarefasPorPrioridadeECategoria(tasks, numTasks);
+                break;
+            case 9:
+                exportarTarefasPorPrioridade(tasks, numTasks);
                 break;
             case 0:
                 printf("Encerrando o programa.\n");
